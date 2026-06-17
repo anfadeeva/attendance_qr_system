@@ -1,0 +1,118 @@
+{% extends 'attendance_app/base.html' %}
+
+{% block content %}
+<style>
+    #qr-container {
+        margin: 0.5rem 0;
+        text-align: center;
+    }
+    h2 {
+        margin-bottom: 0.3rem;
+    }
+    .session-info {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 0.8rem 1rem;
+        margin-bottom: 0.8rem;
+        font-size: 1.1rem;
+    }
+    .session-info p {
+        margin-bottom: 0.3rem;
+    }
+    #qr-image {
+        max-width: 100%;         /* на маленьких экранах займёт всю ширину */
+        width: auto;
+        height: auto;
+        /* Ограничиваем максимальный размер, чтобы не был гигантским на десктопах */
+        max-height: 60vh;        /* 60% высоты видимой области */
+        object-fit: contain;
+    }
+    .otp-code {
+        font-size: 3em;
+        font-weight: bold;
+        letter-spacing: 10px;
+        margin: 0.2rem 0;
+    }
+    .timer-display {
+        font-size: 1.8em;
+        color: #dc3545;
+        font-weight: bold;
+    }
+    @media (min-width: 768px) {
+        .qr-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+        }
+        .qr-col {
+            flex: 0 0 auto;
+        }
+        #qr-image {
+            max-width: 550px;      /* на компьютерах — до 550 пикселей, можно менять */
+            max-height: 70vh;
+        }
+    }
+</style>
+
+<h2>QR-код для занятия</h2>
+
+<!-- Блок с информацией о занятии -->
+<div class="session-info">
+    <p><strong>Предмет:</strong> {{ session.subject.title }}</p>
+    <p><strong>Группа:</strong> {{ session.subject.group.name }}</p>
+    <p><strong>Начало:</strong> {{ session.start_time|date:"d.m.Y H:i" }}</p>
+</div>
+
+<div class="qr-row">
+    <div class="qr-col" id="qr-container">
+        <img src="{{ data_uri }}" alt="QR-код" id="qr-image">
+    </div>
+    <div class="qr-col">
+        <h3>Код для ручного ввода</h3>
+        <div class="otp-code">{{ otp_code }}</div>
+        <p>Код действителен: <span id="timer" class="timer-display">30</span> сек.</p>
+    </div>
+</div>
+
+{{ update_interval|json_script:"update-interval-data" }}
+
+<script>
+    (function() {
+        const intervalEl = document.getElementById('update-interval-data');
+        const UPDATE_INTERVAL_SEC = intervalEl ? parseInt(intervalEl.textContent, 10) : 30;
+        const UPDATE_INTERVAL_MS = UPDATE_INTERVAL_SEC * 1000;
+        let countdown = UPDATE_INTERVAL_SEC;
+
+        const timerSpan = document.getElementById('timer');
+        const qrImg = document.getElementById('qr-image');
+
+        function updateQR() {
+            fetch(window.location.href)
+                .then(r => r.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newImg = doc.getElementById('qr-image');
+                    if (newImg) qrImg.src = newImg.src;
+                    countdown = UPDATE_INTERVAL_SEC;
+                    timerSpan.textContent = countdown;
+                })
+                .catch(err => console.error('Ошибка обновления QR:', err));
+        }
+
+        setInterval(() => {
+            countdown--;
+            timerSpan.textContent = countdown;
+            if (countdown <= 0) {
+                updateQR();
+                countdown = UPDATE_INTERVAL_SEC;
+            }
+        }, 1000);
+
+        setInterval(() => {
+            location.reload();
+        }, UPDATE_INTERVAL_MS);
+    })();
+</script>
+{% endblock %}

@@ -1,0 +1,26 @@
+{{% extends 'attendance_app/base.html' %}
+
+{% block content %}
+<h2>Отчёт о посещаемости</h2>
+<form method="get" class="row g-3">
+    <div class="col-md-3">
+        {{ form.group.label_tag }}
+        {{ form.group }}
+    </div>
+    <div class="col-md-3">
+        {{ form.subject.label_tag }}
+        {{ form.subject }}
+    </div>
+    <div class="col-md-2">
+        {{ form.date_from.label_tag }}
+        {{ form.date_from }}
+    </div>
+    <div class="col-md-2">
+        {{ form.date_to.label_tag }}
+        {{ form.date_to }}
+    </div>
+    <div class="col-12">
+        <button type="submit" class="btn btn-primary">Скачать Excel</button>
+    </div>
+</form>
+{% endblock %}

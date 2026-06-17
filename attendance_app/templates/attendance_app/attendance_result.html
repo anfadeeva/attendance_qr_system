@@ -1,0 +1,16 @@
+{% extends 'attendance_app/base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <h3>Результат отметки</h3>
+        {% if success %}
+            <div class="alert alert-success">{{ message }}</div>
+        {% else %}
+            <div class="alert alert-warning">{{ message }}</div>
+        {% endif %}
+        <a href="{% url 'attendance_app:index' %}" class="btn btn-primary">На главную</a>
+        <a href="{% url 'attendance_app:manual_mark' %}" class="btn btn-outline-secondary">Отметить ещё раз</a>
+    </div>
+</div>
+{% endblock %}

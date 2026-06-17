@@ -1,0 +1,45 @@
+{% extends 'attendance_app/base.html' %}
+
+{% block content %}
+<h2>Мои отчёты</h2>
+<p><strong>Студент:</strong> {{ user.get_full_name|default:user.username }}</p>
+<p><strong>Группа:</strong> {{ group.name }}</p>
+
+<form method="get" class="row g-3 mb-4">
+    <div class="col-md-4">
+        <label>С</label>
+        <input type="date" name="date_from" value="{{ date_from }}" class="form-control">
+    </div>
+    <div class="col-md-4">
+        <label>По</label>
+        <input type="date" name="date_to" value="{{ date_to }}" class="form-control">
+    </div>
+    <div class="col-md-4 d-flex align-items-end">
+        <button type="submit" class="btn btn-outline-secondary w-100 me-2">Показать</button>
+        <button type="submit" name="download" value="excel" class="btn btn-success w-100">Скачать Excel</button>
+    </div>
+</form>
+
+{% if rows %}
+<h3>Предпросмотр</h3>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Дисциплина</th>
+            {% for date in dates %}
+            <th>{{ date|date:"d.m.Y" }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in rows %}
+        <tr>
+            {% for cell in row %}
+            <td>{{ cell }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+{% endblock %}

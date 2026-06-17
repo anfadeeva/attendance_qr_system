@@ -1,0 +1,12 @@
+Django>=4.2
+gunicorn
+psycopg2-binary
+qrcode[pil]
+Pillow
+openpyxl
+djangorestframework
+django-otp
+django-widget-tweaks>=1.4.12
+django-jazzmin==3.0.1
+whitenoise
+reportlab>=4.2.0

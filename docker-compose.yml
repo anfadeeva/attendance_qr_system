@@ -1,0 +1,32 @@
+
+
+services:
+  web:
+    build: .
+    command: gunicorn attendance_project.wsgi:application --bind 0.0.0.0:8000 --workers 4 --threads 2 --timeout 30
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - DEBUG=True
+      - DB_ENGINE=postgres            # <-- добавить
+      - POSTGRES_DB=attendance        # <-- добавить
+      - POSTGRES_USER=attendance_user # <-- добавить
+      - POSTGRES_PASSWORD=attendance_pass # <-- добавить
+      - DB_HOST=db                    # <-- добавить
+      - DB_PORT=5432 
+
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: attendance
+      POSTGRES_USER: attendance_user
+      POSTGRES_PASSWORD: attendance_pass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+
+volumes:
+  postgres_data:

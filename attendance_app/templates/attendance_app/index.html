@@ -1,0 +1,85 @@
+{% extends 'attendance_app/base.html' %}
+
+{% block content %}
+<h1>Система учёта посещаемости</h1>
+
+{% if user.is_authenticated %}
+    {% if role == 'teacher' %}
+        <div class="alert alert-info">
+            Вы вошли как преподаватель: {{ user.username }}
+        </div>
+        <h3>Мои занятия</h3>
+        <a href="{% url 'attendance_app:create_session' %}" class="btn btn-success mb-3">+ Создать новое занятие</a>
+        <a href="{% url 'attendance_app:report' %}" class="btn btn-outline-primary mb-3">📊 Отчёты</a>
+
+        {% if sessions %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Предмет</th>
+                        <th>Группа</th>
+                        <th>Начало</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for session in sessions %}
+                    <tr>
+                        <td>{{ session.subject.title }}</td>
+                        <td>{{ session.subject.group.name }}</td>
+                        <td>{{ session.start_time|date:"d.m.Y H:i" }}</td>
+                        <td>
+                            <a href="{% url 'attendance_app:show_qr' session.id %}" class="btn btn-sm btn-primary">QR-код</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>У вас пока нет занятий. <a href="{% url 'attendance_app:create_session' %}">Создайте первое</a>.</p>
+        {% endif %}
+
+    {% elif role == 'student' %}
+        <div class="alert alert-info">
+            Вы вошли как студент: {{ user.username }}
+        </div>
+        <h3>Мои отметки</h3>
+        <a href="{% url 'attendance_app:manual_mark' %}" class="btn btn-success mb-3">📱 Отметиться вручную</a>
+
+        {% if attendances %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Предмет</th>
+                        <th>Дата занятия</th>
+                        <th>Время отметки</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for att in attendances %}
+                    <tr>
+                        <td>{{ att.session.subject.title }}</td>
+                        <td>{{ att.session.start_time|date:"d.m.Y H:i" }}</td>
+                        <td>{{ att.timestamp|date:"d.m.Y H:i:s" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>У вас пока нет отметок. Отсканируйте QR-код на занятии или <a href="{% url 'attendance_app:manual_mark' %}">введите код вручную</a>.</p>
+        {% endif %}
+
+    {% elif role == 'admin' %}
+        <div class="alert alert-warning">
+            Вы вошли как администратор.
+        </div>
+        <p><a href="{% url 'admin:index' %}" class="btn btn-primary">Перейти в админ-панель</a></p>
+        <p><a href="{% url 'attendance_app:report' %}" class="btn btn-outline-secondary">Скачать отчёт</a></p>
+    {% endif %}
+
+{% else %}
+    <div class="jumbotron">
+        <p>Пожалуйста, <a href="{% url 'attendance_app:login' %}">войдите</a> для продолжения.</p>
+    </div>
+{% endif %}
+{% endblock %}

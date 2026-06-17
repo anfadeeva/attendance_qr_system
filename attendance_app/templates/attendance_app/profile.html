@@ -1,0 +1,44 @@
+{% extends 'attendance_app/base.html' %}
+
+{% block content %}
+<h2>Профиль пользователя</h2>
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+{% endif %}
+
+{% if is_student %}
+    <div class="row">
+        <div class="col-md-6">
+            <h4>Основные данные</h4>
+            <p><strong>Логин:</strong> {{ user.username }}</p>
+            <p><strong>Имя:</strong> {{ user.first_name }} {{ user.last_name }}</p>
+            <p><strong>Email:</strong> 
+                <form method="post" class="d-inline">
+                    {% csrf_token %}
+                    <input type="email" name="email" value="{{ user.email }}" class="form-control d-inline" style="width: auto;">
+                    <button type="submit" class="btn btn-sm btn-primary">Сохранить email</button>
+                </form>
+            </p>
+            <a href="{% url 'attendance_app:password_change' %}" class="btn btn-warning">Сменить пароль</a>
+        </div>
+        <div class="col-md-6">
+            <h4>Учебные данные</h4>
+            <p><strong>Группа:</strong> {{ profile.group.name|default:"Не назначена" }}</p>
+        </div>
+    </div>
+{% else %}
+    <form method="post">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-6">
+                <h4>Основные данные</h4>
+                {{ user_form.as_p }}
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+        <a href="{% url 'attendance_app:password_change' %}" class="btn btn-warning">Сменить пароль</a>
+    </form>
+{% endif %}
+{% endblock %}
