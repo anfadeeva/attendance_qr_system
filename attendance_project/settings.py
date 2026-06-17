@@ -17,6 +17,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+CSRF_TRUSTED_ORIGINS = ['https://attendanceqrsystem-production.up.railway.app/admin/login/?next=/admin/']
+
+
+
 
 # Application definition
 
